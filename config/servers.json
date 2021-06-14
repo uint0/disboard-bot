@@ -1,0 +1,20 @@
+{
+    "servers": [
+        {
+            "name": "Example",
+            "aliases": ["eg", "ex"],
+
+            "resource": {
+                "group": "games",
+                "name": "example-instance"
+            },
+            
+            "perms": ["read", "metrics"],
+
+            "meta": {
+                "game": "My Game",
+                "owner": ["example#1234"]
+            }
+        }
+    ]
+}

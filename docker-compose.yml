@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  disboard:
+    image: disboard.discord.local
+    build: .
+    env_file: .env
