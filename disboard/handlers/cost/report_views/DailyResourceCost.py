@@ -48,7 +48,7 @@ class DailyResourceCostView(BaseView.BaseView):
     
     def render(self, data):
         if not (self._start_date or self._end_date):
-            self._guess_dates(data)
+            self.populate_dates_from_data(data)
 
         resource_daily_costs = self.get_resource_daily_costs(data)
         fig = self.make_figure(resource_daily_costs)
@@ -118,14 +118,3 @@ class DailyResourceCostView(BaseView.BaseView):
             tick.set_rotation(330)
 
         return fig
-    
-    def _guess_dates(self, data):
-        day_getter, = util.data.column_getters(
-            data.columns,
-            ['UsageDate']
-        )
-
-        all_dates = [util.time.from_int_date(day_getter(row)) for row in data.rows]
-
-        self._start_date = min(all_dates)
-        self._end_date   = max(all_dates)

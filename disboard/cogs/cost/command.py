@@ -1,3 +1,5 @@
+import datetime as dt
+
 import discord
 import discord.ext.commands as commands
 import cogs.util.decorators as deco
@@ -11,7 +13,7 @@ USAGE_MSG = """
 Usage:
   !cost
     report <report_view> (date | current_billing | current_month) [...timeframe_args]
-    credit [history_n_cycles]
+    summary
 """.strip()
 
 
@@ -58,9 +60,20 @@ class CostCommand(commands.Cog):
 
     @cost.command()
     @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
-    async def credit(self, ctx, history_n_cycles: int = 0):
-        if history_n_cycles != 0:
-            await ctx.send("Cycles != 0 is unimplemented :(")
-            return
+    async def summary(self, ctx):
+        summary = self._cost.summary()
 
-        await ctx.send("Unimplemented :(")
+        days_remaining = (util.time.midnight(summary.end_date) - util.time.midnight(dt.date.today())).days
+
+        embed = discord.Embed(
+            title="Cost Summary",
+            description=f"{summary.start_date:%Y-%m-%d} to {summary.end_date:%Y-%m-%d}",
+            color=0xffff1a
+        )
+        embed.set_author(name="Azure Cost Management")
+        embed.set_thumbnail(url='https://pbs.twimg.com/profile_images/1283873419117789184/n5W9EoMe_400x400.jpg')
+        embed.add_field(name="Days Remaining", value=f"{days_remaining} day(s)", inline=True)
+        embed.add_field(name="Total Cost", value=f"${summary.total_costs:.2f}", inline=True)
+        embed.set_footer(text=f"Latest Cost Reporting: {summary.latest_reported_date:%Y-%m-%d}")
+
+        await ctx.send(embed=embed)
