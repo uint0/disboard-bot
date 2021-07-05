@@ -66,10 +66,9 @@ class Server:
     def called_name(self):
         return self._called_name
 
-
     @requires_perm('read')
-    def get_status(self):
-        instance_view = self._manager.get_vm_instance_view()
+    async def get_status(self):
+        instance_view = await self._manager.get_vm_instance_view()
         statuses = instance_view.statuses
         provision_status = statuses[0]
         power_status = statuses[1]
@@ -79,33 +78,14 @@ class Server:
             status_name=power_status.display_status,
             status_time=dt.datetime.now(dt.timezone.utc) - provision_status.time if provision_status.time else None
         )
-    
-    async def _poll_for_status(self, expected_status, handler):
-        logger.info("polling server %s to reach terminal state", self)
-        try:
-            while True:
-                await asyncio.sleep(IOTA)
-                instance_view = self._manager.get_vm_instance_view()
-                statuses = instance_view.statuses
-                if len(statuses) < 2:
-                    logging.info("no state for server %s, repolling", self)
-                    continue
-                current_status = statuses[1].code
-                logger.info("current state for server %s is %s, wanted %s", self, current_status, expected_status)
-                if current_status == expected_status:
-                    return await handler(True)
-                elif current_status in TERMINAL_STATUSES:
-                    return await handler(False)
-        except:
-            logger.exception("unexpected error when polling for status of server %s", self)
-            return await handler(False)
 
     @requires_perm('power')
-    async def start(self, handler):
-        asyncio.create_task(self._poll_for_status(SERVER_RUNNING, handler))
-        return self._manager.start()
+    async def start(self):
+        return await self._manager.start()
     
     @requires_perm('power')
-    async def stop(self, handler):
-        asyncio.create_task(self._poll_for_status(SERVER_DEALLOCATED, handler))
-        return self._manager.stop()
+    async def stop(self):
+        return await self._manager.stop()
+    
+    async def close(self):
+        return await self._manager.close()

@@ -54,14 +54,14 @@ class CostCommand(commands.Cog):
             end_date=end_date
         )
 
-        img = self._cost.report(report, report_spec)
+        img = await self._cost.report(report, report_spec)
         await ctx.send(file=discord.File(img, f'costs.png'))
 
 
     @cost.command()
     @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
     async def summary(self, ctx):
-        summary = self._cost.summary()
+        summary = await self._cost.summary()
 
         days_remaining = (util.time.midnight(summary.end_date) - util.time.midnight(dt.date.today())).days
 

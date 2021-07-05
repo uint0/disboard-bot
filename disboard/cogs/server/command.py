@@ -1,11 +1,13 @@
+import logging
+
 import discord
 import discord.ext.commands as commands
 
+import util.azure
 import cogs.server.converter as converter
 import cogs.util.decorators as deco
 import handlers.server.exceptions as server_exceptions
 import config
-import logging
 
 
 NO_SUCH_SERVER_MSG = "No such server. Find available servers with !server list"
@@ -39,7 +41,10 @@ class ServerCommand(commands.Cog):
             return await ctx.send(NO_SUCH_SERVER_MSG)
 
         logger.info("user %s:[%s] requested status for %s", ctx.message.author, ctx.message.author.id, server)
-        status = server.get_status()
+
+        async with util.azure.aio_resource(server):
+            status = await server.get_status()
+
         embed = discord.Embed(
             title=server.name,
             description=f"{server.resource_names.group}/{server.resource_names.name}",
@@ -82,7 +87,14 @@ class ServerCommand(commands.Cog):
             return await ctx.send(NO_SUCH_SERVER_MSG)
         
         logger.info("user %s:[%s] requested start for %s", ctx.message.author, ctx.message.author.id, server)
-        await server.start(await self._send_server_action(ctx, f"Starting server {server}..."))
+        msg = await ctx.reply(f"Starting server {server}...")
+
+        async with util.azure.aio_resource(server):
+            waiter = await server.start()
+            await waiter.result()
+
+        await msg.reply('Server start request complete.')
+
 
     @server.command(aliases=['stop'])
     @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
@@ -92,16 +104,13 @@ class ServerCommand(commands.Cog):
             return await ctx.send(NO_SUCH_SERVER_MSG)
         
         logger.info("user %s:[%s] requested deallocate for %s", ctx.message.author, ctx.message.author.id, server)
-        await server.stop(await self._send_server_action(ctx, f"Deallocating server {server}..."))
+        msg = await ctx.reply(f"Deallocating server {server}...")
 
-    @server.command()
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
-    @deco.raises_exception(server_exceptions.ServerForbiddenException)
-    async def metrics(self, ctx, server: converter.ServerConverter):
-        if not server:
-            return await ctx.send(NO_SUCH_SERVER_MSG)
+        async with util.azure.aio_resource(server):
+            waiter = await server.stop()
+            await waiter.result()
 
-        await ctx.send("Not Implemented Yet D:")
+        await msg.reply('Server deallocation request complete.')
     
     @server.command(name='list')
     @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
@@ -112,13 +121,3 @@ class ServerCommand(commands.Cog):
     @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
     async def help(self, ctx):
         await ctx.send(USAGE_MSG)
-
-    async def _send_server_action(self, ctx, message):
-        message = await ctx.reply(message)
-        async def handler(status):
-            if status:
-                return await message.reply("Operation completed successfully")
-            else:
-                return await message.reply("Operation completed unsuccessfully")
-
-        return handler

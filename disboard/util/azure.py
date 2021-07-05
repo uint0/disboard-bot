@@ -1,6 +1,8 @@
+import contextlib
 import collections
 
 import azure.identity
+import azure.identity.aio
 
 import config
 
@@ -12,9 +14,10 @@ ResourceDescriptor = collections.namedtuple('ResoucDescriptor', [
     'name'
 ])
 
-def get_credentials():
+
+def get_aio_credentials():
     subscription_id = config.azure.AZURE_SUBSCRIPTION_ID
-    credentials = azure.identity.DefaultAzureCredential()
+    credentials = azure.identity.aio.DefaultAzureCredential()
     return credentials, subscription_id
 
 
@@ -59,3 +62,11 @@ def derive_resource_descriptor(resource_full_id):
 def resource_short_name(resource_full_id):
     descriptor = derive_resource_descriptor(resource_full_id)
     return f"{descriptor.type}/{descriptor.name}"
+
+
+@contextlib.asynccontextmanager
+async def aio_resource(aio_resource):
+    try:
+        yield aio_resource
+    finally:
+        await aio_resource.close()

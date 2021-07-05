@@ -1,21 +1,21 @@
 import datetime as dt
 
-import azure.mgmt.costmanagement
+import azure.mgmt.costmanagement.aio
 
 import util.azure
 
 
 class CostClient:
     def __init__(self):
-        creds, subscription_id = util.azure.get_credentials()
+        creds, subscription_id = util.azure.get_aio_credentials()
         self._subscription_id = subscription_id
-        self._cost_management = azure.mgmt.costmanagement.CostManagementClient(
+        self._cost_management = azure.mgmt.costmanagement.aio.CostManagementClient(
             credential=creds,
             subscription_id=subscription_id
         )
 
 
-    def report(
+    async def report(
         self, *,
         scope=None,
         timeframe='custom',
@@ -25,7 +25,7 @@ class CostClient:
     ):
         scope = scope or f'/subscriptions/{self._subscription_id}'
 
-        return self._query_usage(
+        return await self._query_usage(
             scope,
             query_type='ActualCost',
             timeframe=timeframe,
@@ -34,12 +34,8 @@ class CostClient:
             dataset=dataset
         )
 
-
-    def credit(self):
-        pass
-
     
-    def _query_usage(
+    async def _query_usage(
         self, scope, *,
         query_type: str='ActualCost',
         timeframe: str='custom',
@@ -61,4 +57,4 @@ class CostClient:
                 'to':to_date
             }
 
-        return self._cost_management.query.usage(scope, query)
+        return await self._cost_management.query.usage(scope, query)

@@ -29,8 +29,7 @@ class Cost:
     def __init__(self):
         self._cost_client = handlers.cost.CostClient.CostClient()
 
-
-    def report(
+    async def report(
         self,
         view_name: str,
         report_spec: ReportSpec
@@ -42,7 +41,7 @@ class Cost:
 
         view = handlers.cost.report_views.get_view_by_name(view_name)(start_date, end_date)
 
-        usage_info = self._cost_client.report(
+        usage_info = await self._cost_client.report(
             dataset=view.dataset,
             timeframe=timeframe,
             from_date=start_date,
@@ -50,10 +49,10 @@ class Cost:
         )
 
         return view.render(usage_info)
-    
-    def summary(self):
+
+    async def summary(self):
         view = handlers.cost.report_views.get_view_by_name(SUMMARY_VIEW)()
-        usage_info = self._cost_client.report(
+        usage_info = await self._cost_client.report(
             dataset=view.dataset,
             timeframe='last_invoice'
         )
@@ -67,8 +66,6 @@ class Cost:
             total_costs=sum(cost_getter(r) for r in usage_info.rows)
         )
 
-
-    
     def list_views(self):
         return handlers.cost.report_views.list_views()
 
