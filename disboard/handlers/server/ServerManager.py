@@ -1,12 +1,7 @@
-import azure.identity
 import azure.mgmt.compute
 
 import config
-
-def get_credentials():
-    subscription_id = config.azure.AZURE_SUBSCRIPTION_ID
-    credentials = azure.identity.DefaultAzureCredential()
-    return credentials, subscription_id
+import util.azure
 
 
 class ServerManager:
@@ -14,7 +9,7 @@ class ServerManager:
         self._group_name = group_name
         self._vm_name    = vm_name
 
-        creds, subscription_id = get_credentials()
+        creds, subscription_id = util.azure.get_credentials()
         self._client = azure.mgmt.compute.ComputeManagementClient(creds, subscription_id)
 
     def start(self):
@@ -35,7 +30,6 @@ class ServerManager:
             self._vm_name
         )
     
-
     @staticmethod
     def wait(self, waiter):
         return waiter.wait()

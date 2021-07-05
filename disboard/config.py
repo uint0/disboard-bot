@@ -1,6 +1,8 @@
 import os
 import json
 
+import matplotlib.pyplot as plt
+
 
 class _ServerConfig:
     def __init__(self, config_file):
@@ -46,14 +48,17 @@ class _ServerConfig:
         return list(self._config.keys())
 
 
-
 class _AzureConfig:
     AZURE_SUBSCRIPTION_ID = os.environ['AZURE_SUBSCRIPTION_ID']
+
 
 class _DiscordConfig:
     DISCORD_BOT_TOKEN     = os.environ['DISCORD_BOT_TOKEN']
     DISCORD_CHANNEL_AZURE = os.environ['DISCORD_CHANNEL_AZURE']
 
+
 server  = _ServerConfig(os.path.join(os.environ.get('DISBOARD_CONF_DIR', '../config'), 'servers.json'))
 azure   = _AzureConfig()
 discord = _DiscordConfig()
+
+plt.style.use('seaborn-deep')

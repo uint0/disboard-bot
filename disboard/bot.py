@@ -5,6 +5,7 @@ import discord
 import discord.ext.commands
 
 import cogs.server.command
+import cogs.cost.command
 import config
 
 
@@ -15,6 +16,7 @@ logging.getLogger('discord').setLevel(logging.ERROR)
 
 bot = discord.ext.commands.Bot(command_prefix='!')
 bot.add_cog(cogs.server.command.ServerCommand(bot))
+bot.add_cog(cogs.cost.command.CostCommand(bot))
 
 
 if __name__ ==  "__main__":
