@@ -2,6 +2,7 @@ import datetime as dt
 
 import azure.mgmt.costmanagement.aio
 
+import util.cache
 import util.azure
 
 
@@ -15,6 +16,7 @@ class CostClient:
         )
 
 
+    @util.cache.async_cache_ttl(ttl=60 * 60, skip_n=1)
     async def report(
         self, *,
         scope=None,
@@ -34,7 +36,7 @@ class CostClient:
             dataset=dataset
         )
 
-    
+
     async def _query_usage(
         self, scope, *,
         query_type: str='ActualCost',
