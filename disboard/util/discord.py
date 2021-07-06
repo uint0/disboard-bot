@@ -1,6 +1,10 @@
 import functools
 
 
+def cache_command():
+    pass
+
+
 def require_channel(channel):
     def decorator(func):
         @functools.wraps(func)

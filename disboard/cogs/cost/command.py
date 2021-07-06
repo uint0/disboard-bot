@@ -2,11 +2,12 @@ import datetime as dt
 
 import discord
 import discord.ext.commands as commands
-import cogs.util.decorators as deco
+
+import util.discord
+import util.converter
 
 import handlers.cost.cost as cost_handler
 import handlers.cost.exceptions as cost_exceptions
-import util.converter
 import config
 
 
@@ -25,15 +26,15 @@ class CostCommand(commands.Cog):
     
 
     @commands.group()
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
     async def cost(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send(USAGE_MSG)
 
 
     @cost.command()
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
-    @deco.raises_exception(cost_exceptions.CostViewNotFoundException)
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @util.discord.raises_exception(cost_exceptions.CostViewNotFoundException)
     async def report(self, ctx,
         report: str,
         report_timeframe: util.converter.AliasedStr({
@@ -61,7 +62,7 @@ class CostCommand(commands.Cog):
 
 
     @cost.command()
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
     async def summary(self, ctx):
         summary = await self._cost.summary()
 

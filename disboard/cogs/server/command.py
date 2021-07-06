@@ -4,8 +4,9 @@ import discord
 import discord.ext.commands as commands
 
 import util.azure
+import util.discord
+
 import cogs.server.converter as converter
-import cogs.util.decorators as deco
 import handlers.server.exceptions as server_exceptions
 import config
 
@@ -28,14 +29,14 @@ class ServerCommand(commands.Cog):
         self.bot = bot
 
     @commands.group()
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
     async def server(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send(USAGE_MSG)
 
     @server.command()
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
-    @deco.raises_exception(server_exceptions.ServerForbiddenException)
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @util.discord.raises_exception(server_exceptions.ServerForbiddenException)
     async def status(self, ctx, server: converter.ServerConverter):
         if not server:
             return await ctx.send(NO_SUCH_SERVER_MSG)
@@ -80,8 +81,8 @@ class ServerCommand(commands.Cog):
 
 
     @server.command()
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
-    @deco.raises_exception(server_exceptions.ServerForbiddenException)
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @util.discord.raises_exception(server_exceptions.ServerForbiddenException)
     async def start(self, ctx, server: converter.ServerConverter):
         if not server:
             return await ctx.send(NO_SUCH_SERVER_MSG)
@@ -97,8 +98,8 @@ class ServerCommand(commands.Cog):
 
 
     @server.command(aliases=['stop'])
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
-    @deco.raises_exception(server_exceptions.ServerForbiddenException)
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @util.discord.raises_exception(server_exceptions.ServerForbiddenException)
     async def deallocate(self, ctx, server: converter.ServerConverter):
         if not server:
             return await ctx.send(NO_SUCH_SERVER_MSG)
@@ -113,11 +114,11 @@ class ServerCommand(commands.Cog):
         await msg.reply('Server deallocation request complete.')
     
     @server.command(name='list')
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
     async def _list(self, ctx):
         await ctx.send(f"Available Servers: {', '.join(config.server.list_servers())}")
 
     @server.command()
-    @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
     async def help(self, ctx):
         await ctx.send(USAGE_MSG)
