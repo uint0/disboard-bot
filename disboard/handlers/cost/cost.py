@@ -7,6 +7,7 @@ import util.time
 
 import handlers.cost.CostClient
 import handlers.cost.report_views
+import handlers.cost.exceptions
 
 SUMMARY_VIEW = 'daily_resource_cost'
 BILLING_PERIOD_LENGTH = dtutil.relativedelta.relativedelta(months=1)
@@ -39,7 +40,10 @@ class Cost:
             end_date   = end_date   or util.time.midnight(dt.date.today())
             start_date = start_date or (end_date - dt.timedelta(days=30))
 
-        view = handlers.cost.report_views.get_view_by_name(view_name)(start_date, end_date)
+        try:
+            view = handlers.cost.report_views.get_view_by_name(view_name)(start_date, end_date)
+        except KeyError as e:
+            raise handlers.cost.exceptions.CostViewNotFoundException(f"View {view_name} cannot be found") from e
 
         usage_info = await self._cost_client.report(
             dataset=view.dataset,

@@ -5,6 +5,7 @@ import discord.ext.commands as commands
 import cogs.util.decorators as deco
 
 import handlers.cost.cost as cost_handler
+import handlers.cost.exceptions as cost_exceptions
 import util.converter
 import config
 
@@ -32,6 +33,7 @@ class CostCommand(commands.Cog):
 
     @cost.command()
     @deco.require_channel(config.discord.DISCORD_CHANNEL_AZURE)
+    @deco.raises_exception(cost_exceptions.CostViewNotFoundException)
     async def report(self, ctx,
         report: str,
         report_timeframe: util.converter.AliasedStr({
