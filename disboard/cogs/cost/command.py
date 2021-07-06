@@ -66,7 +66,9 @@ class CostCommand(commands.Cog):
     async def summary(self, ctx):
         summary = await self._cost.summary()
 
+        billing_period_length = (util.time.midnight(summary.end_date) - util.time.midnight(summary.start_date)).days
         days_remaining = (util.time.midnight(summary.end_date) - util.time.midnight(dt.date.today())).days
+        days_elapsed   = billing_period_length - days_remaining
 
         embed = discord.Embed(
             title="Cost Summary",
@@ -75,8 +77,21 @@ class CostCommand(commands.Cog):
         )
         embed.set_author(name="Azure Cost Management")
         embed.set_thumbnail(url='https://pbs.twimg.com/profile_images/1283873419117789184/n5W9EoMe_400x400.jpg')
-        embed.add_field(name="Days Remaining", value=f"{days_remaining} day(s)", inline=True)
-        embed.add_field(name="Total Cost", value=f"${summary.total_costs:.2f}", inline=True)
+        embed.add_field(
+            name="Days Remaining",
+            value=f"{days_remaining} day(s)",
+            inline=True
+        )
+
+        embed.add_field(
+            name="Total Cost",
+            value=f"${summary.total_costs:.2f}",
+        )
+        embed.add_field(
+            name="Linear Cost Forecast",
+            value=f"${billing_period_length * summary.total_costs / days_elapsed:.2f}",
+            inline=True
+        )
         embed.set_footer(text=f"Latest Cost Reporting: {summary.latest_reported_date:%Y-%m-%d}")
 
         await ctx.send(embed=embed)
