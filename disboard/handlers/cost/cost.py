@@ -4,6 +4,7 @@ import dateutil as dtutil
 
 import util.data
 import util.time
+import util.cache
 
 import handlers.cost.CostClient
 import handlers.cost.report_views
@@ -30,6 +31,8 @@ class Cost:
     def __init__(self):
         self._cost_client = handlers.cost.CostClient.CostClient()
 
+    # 3 hr TTL
+    @util.cache.async_cache_ttl(ttl=60 * 60 * 3)
     async def report(
         self,
         view_name: str,
@@ -54,6 +57,8 @@ class Cost:
 
         return view.render(usage_info)
 
+    # 3 hr TTL
+    @util.cache.async_cache_ttl(ttl=60 * 60 * 3)
     async def summary(self):
         view = handlers.cost.report_views.get_view_by_name(SUMMARY_VIEW)()
         usage_info = await self._cost_client.report(
