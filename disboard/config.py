@@ -54,11 +54,22 @@ class _AzureConfig:
 
 class _DiscordConfig:
     DISCORD_BOT_TOKEN     = os.environ['DISCORD_BOT_TOKEN']
+
     DISCORD_CHANNEL_AZURE = os.environ['DISCORD_CHANNEL_AZURE']
+    DISCORD_CHANNEL_MINECRAFT = int(os.environ['DISCORD_CHANNEL_MINECRAFT'])
+
+
+class _WebAppEventsConfig:
+    HMAC_KEY = bytes.fromhex(os.environ['WEBAPP_EVENTS_HMAC_KEY'])
+
+
+class _WebApp:
+    events = _WebAppEventsConfig()
 
 
 server  = _ServerConfig(os.path.join(os.environ.get('DISBOARD_CONF_DIR', '../config'), 'servers.json'))
 azure   = _AzureConfig()
 discord = _DiscordConfig()
+webapp  = _WebApp()
 
 plt.style.use('seaborn-deep')
