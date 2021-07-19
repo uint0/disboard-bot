@@ -1,10 +1,6 @@
-import os
 import json
 
-import matplotlib.pyplot as plt
-
-
-class _ServerConfig:
+class ServerConfig:
     def __init__(self, config_file):
         self._file_path = config_file
         self._alias_map = {}
@@ -46,30 +42,3 @@ class _ServerConfig:
     
     def list_servers(self):
         return list(self._config.keys())
-
-
-class _AzureConfig:
-    AZURE_SUBSCRIPTION_ID = os.environ['AZURE_SUBSCRIPTION_ID']
-
-
-class _DiscordConfig:
-    DISCORD_BOT_TOKEN     = os.environ['DISCORD_BOT_TOKEN']
-
-    DISCORD_CHANNEL_AZURE = os.environ['DISCORD_CHANNEL_AZURE']
-    DISCORD_CHANNEL_MINECRAFT = int(os.environ['DISCORD_CHANNEL_MINECRAFT'])
-
-
-class _WebAppEventsConfig:
-    HMAC_KEY = bytes.fromhex(os.environ['WEBAPP_EVENTS_HMAC_KEY'])
-
-
-class _WebApp:
-    events = _WebAppEventsConfig()
-
-
-server  = _ServerConfig(os.path.join(os.environ.get('DISBOARD_CONF_DIR', '../config'), 'servers.json'))
-azure   = _AzureConfig()
-discord = _DiscordConfig()
-webapp  = _WebApp()
-
-plt.style.use('seaborn-deep')

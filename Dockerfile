@@ -10,4 +10,4 @@ COPY config /etc/disboard
 
 ENV DISBOARD_CONF_DIR=/etc/disboard
 
-ENTRYPOINT ["python", "-OO", "bot.py"]
+ENTRYPOINT ["uvicorn", "webapp:app"]

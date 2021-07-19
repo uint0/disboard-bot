@@ -1,7 +1,14 @@
 import discord
 import discord.ext.commands as commands
 
+import util.discord
 import config
+
+
+USAGE_MSG = """
+!mcserver
+    status <server_name>
+""".strip()
 
 
 def get_server_icon(server_type: str):
@@ -14,6 +21,7 @@ class MinecraftCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.channel = None
+
 
     async def player_connection(
         self,
@@ -40,8 +48,24 @@ class MinecraftCommand(commands.Cog):
 
         await self.send_message(embed=embed)
 
+    @commands.command()
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_MINECRAFT)
+    async def chat_message_to_minecraft():
+        pass
+
+    @commands.group()
+    @util.discord.require_channel(config.discord.DISCORD_CHANNEL_MINECRAFT)
+    async def mcserver(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send(USAGE_MSG)
+
+    async def chat_message_to_discord():
+        pass
     
     async def send_message(self, *args, **kwargs):
         if self.channel is None:
             self.channel = self.bot.get_channel(config.discord.DISCORD_CHANNEL_MINECRAFT)
+
+        c = self.bot.get_channel(123)
+        
         await self.channel.send(*args, **kwargs)
